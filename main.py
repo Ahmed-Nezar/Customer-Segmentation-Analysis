@@ -17,11 +17,12 @@ if __name__ == "__main__":
     '''
     Utils.preprocessor_config["Normalizer"] = "LogNormalizer"
     Utils.preprocessor_config["Encoder"] = "LabelEncoder"
+    dataset = Utils.load_data()
 
-    preprocessor = Preprocessor()
+    preprocessor = Preprocessor(dataset)
 
     #! the final preprocessed dataset is returned with the following line
     dataset_preprocessed = preprocessor.preprocess()
 
-    print(dataset_preprocessed.head())
+    # print(dataset_preprocessed.head())
     print("main.py executed successfully")

@@ -4,7 +4,7 @@ from src.utils import Utils
 
 
 class Preprocessor:
-    def __init__(self):
+    def __init__(self, datset):
         """
         Initializes the Preprocessor class.
 
@@ -13,7 +13,8 @@ class Preprocessor:
             dataset (pd.DataFrame): The dataset loaded from the specified CSV file.
         """
         self.config = Utils.preprocessor_config
-        self.dataset = pd.read_csv(Utils.data_path)
+        # self.dataset = pd.read_csv(Utils.data_path)
+        self.dataset = datset
         # self.Cat_columns = []
 
     def preprocess(self):
