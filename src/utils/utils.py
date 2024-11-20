@@ -2,10 +2,19 @@ import os
 
 
 class Utils:
+
+    preprocessor_config = {
+        "Normalizer": "MinMaxScaler",
+        "Encoder": "OneHotEncoder",
+        "Imputer": "SimpleImputer",
+        "Imputer_strategy": "mean",
+    }
+
     @classmethod    
     def create_directories(self, run_dir: str):
         self.log_path = os.path.join(run_dir, "logs")
-        self.data_path = os.path.join(run_dir, "data")
+        self.data_dir = os.path.join(run_dir, "data")
+        self.data_path = os.path.join(self.data_dir, "dataset.csv")
         self.model_path = os.path.join(self.log_path, "models")
         self.plot_path = os.path.join(self.log_path, "plots")
         os.makedirs(self.log_path, exist_ok=True)
