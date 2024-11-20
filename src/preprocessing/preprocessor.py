@@ -1,65 +1,171 @@
 import pandas as pd
+import numpy as np
 from src.utils import Utils
+
 
 class Preprocessor:
     def __init__(self):
+        """
+        Initializes the Preprocessor class.
+
+        Attributes:
+            config (dict): Configuration settings for the preprocessor.
+            dataset (pd.DataFrame): The dataset loaded from the specified CSV file.
+        """
         self.config = Utils.preprocessor_config
         self.dataset = pd.read_csv(Utils.data_path)
+        # self.Cat_columns = []
 
     def preprocess(self):
-        
-        self.__check_nulls()
-        self.__check_duplicates()
+        """
+        Preprocess the dataset by performing the following steps:
+        1. Drop columns specified in the configuration.
+        2. Scale the dataset.
+        3. Encode categorical variables.
 
+        Returns:
+            pd.DataFrame: The preprocessed dataset.
+        """
+        # self.__check_nulls()
+        # self.__check_duplicates()
+        self.dataset = self.dataset.drop(columns=self.config["excls_cols"])
+        # self.dataset = self.dataset.drop(columns=self.config["excls_cols"])
         self.__scale()
         self.__encode()
         return self.dataset
-    
+
+    def __scale(self):
+        """
+        Scales the numerical columns of the dataset based on the specified normalizer in the configuration.
+        The method supports three types of normalizers:
+        - MinMaxScaler: Scales features to a given range, usually between 0 and 1.
+        - StandardScaler: Standardizes features by removing the mean and scaling to unit variance.
+        - LogNormalizer: Custom normalizer that applies a logarithmic transformation.
+        Raises:
+            ValueError: If the specified normalizer in the configuration is not supported.
+        Note:
+            The columns specified in the configuration under "categorical_cols" are excluded from scaling.
+        """
+        if self.config["Normalizer"] == "MinMaxScaler":
+            from sklearn.preprocessing import MinMaxScaler
+            normalizer = MinMaxScaler()
+
+        elif self.config["Normalizer"] == "StandardScaler":
+            from sklearn.preprocessing import StandardScaler
+            normalizer = StandardScaler()
+
+        elif self.config["Normalizer"] == "LogNormalizer":
+            # from src.preprocessing.preprocessor import LogNormalizer
+            normalizer = LogNormalizer()
+
+        else:
+            raise ValueError(
+                "Normalizer not supported, please choose from MinMaxScaler, StandardScaler or LogNormalizer")
+
+        for col in self.dataset.columns:
+            if col not in self.config["categorical_cols"]:
+                self.dataset[col] = normalizer.fit_transform(
+                    self.dataset[[col]])
+
+    def __encode(self):
+        """
+        Encodes categorical columns in the dataset based on the specified encoder in the configuration.
+        This method supports two types of encoders:
+        1. OneHotEncoder: Converts categorical variables into a series of binary columns.
+        2. LabelEncoder: Converts categorical variables into numeric labels.
+        Raises:
+            ValueError: If the specified encoder in the configuration is not supported.
+        Note:
+            The configuration dictionary (`self.config`) must contain:
+            - "Encoder": A string specifying the encoder type ("OneHotEncoder" or "LabelEncoder").
+            - "categorical_cols": A list of column names that are categorical and need encoding.
+        Example:
+            config = {
+                "Encoder": "OneHotEncoder",
+                "categorical_cols": ["gender", "country"]
+            }
+        """
+        if self.config["Encoder"] == "OneHotEncoder":
+            from sklearn.preprocessing import OneHotEncoder
+            encoder = OneHotEncoder()
+            print(self.dataset.head())
+            for col in self.dataset.columns:
+                if col in self.config["categorical_cols"]:
+                    self.dataset = pd.get_dummies(
+                        self.dataset, columns=[col], dtype=int)
+
+        elif self.config["Encoder"] == "LabelEncoder":
+            from sklearn.preprocessing import LabelEncoder
+            encoder = LabelEncoder()
+            for col in self.dataset.columns:
+                if col in self.config["categorical_cols"]:
+                    self.dataset[col] = encoder.fit_transform(
+                        self.dataset[[col]])
+        else:
+            raise ValueError(
+                "Encoder not supported, please choose from OneHotEncoder or LabelEncoder")
+
     def __check_nulls(self):
+        """
+        Checks for null values in the dataset.
+
+        This method checks if there are any null values in the dataset. If null values are found,
+        it prints "Nulls imputed". Otherwise, it prints "No nulls found".
+        """
         if self.dataset.isnull().sum().sum() > 0:
-            self.__impute()
+            # self.__impute()
             print("Nulls imputed")
         else:
             print("No nulls found")
 
     def __check_duplicates(self):
+        """
+        Check for and remove duplicate rows in the dataset.
+
+        This method checks if there are any duplicate rows in the dataset. If duplicates are found,
+        they are removed, and a message indicating that duplicates were removed is printed. If no
+        duplicates are found, a message indicating that no duplicates were found is printed.
+
+        Returns:
+            None
+        """
         if self.dataset.duplicated().sum() > 0:
             self.dataset = self.dataset.drop_duplicates()
             print("Duplicates removed")
         else:
             print("No duplicates found")
 
-    def __impute(self):
-        if self.config["Imputer"] == "SimpleImputer":
-            from sklearn.impute import SimpleImputer
-            imputer = SimpleImputer(strategy=self.config["Imputer_strategy"])
-        else:
-            raise ValueError("Imputer not supported")
-        
-        self.dataset = imputer.fit_transform(self.dataset)
-        
-    def __scale(self):
-        if self.config["Normalizer"] == "MinMaxScaler":
-            from sklearn.preprocessing import MinMaxScaler
-            normalizer = MinMaxScaler()
-            
-        elif self.config["Normalizer"] == "StandardScaler":
-            from sklearn.preprocessing import StandardScaler
-            normalizer = StandardScaler()
-        else:
-            raise ValueError("Normalizer not supported")
-        
-        self.dataset = normalizer.fit_transform(self.dataset)
+# TODO: Can be moved to another folder if needed
 
-    def __encode(self):
-        if self.config["Encoder"] == "OneHotEncoder":
-            from sklearn.preprocessing import OneHotEncoder
-            encoder = OneHotEncoder()
-        elif self.config["Encoder"] == "LabelEncoder":
-            from sklearn.preprocessing import LabelEncoder
-            encoder = LabelEncoder()
-        else:
-            raise ValueError("Encoder not supported")
-        
-        self.dataset = encoder.fit_transform(self.dataset)
 
+class LogNormalizer():
+    def _Log_Normalize(self, X):
+        """
+        Apply log normalization to the input data.
+
+        This method takes an input array `X` and applies log normalization to it.
+        The transformation is defined as sign(X) * log(abs(X) + 1), which helps in
+        handling both positive and negative values and reducing the impact of large
+        outliers.
+
+        Parameters:
+        X (numpy.ndarray): The input data array to be normalized.
+
+        Returns:
+        numpy.ndarray: The log-normalized data array.
+        """
+        return np.sign(X)*np.log(np.abs(X)+1)
+
+    def fit_transform(self, X):
+        """
+        Fits the preprocessor to the data and transforms it.
+
+        Parameters:
+        X (pd.Series or np.ndarray): The input data to be transformed. If a pandas Series is provided, it will be converted to a numpy array.
+
+        Returns:
+        np.ndarray: The transformed data after applying log normalization.
+        """
+        if isinstance(X, pd.Series):
+            X = X.to_numpy().reshape(-1, 1)
+        return self._Log_Normalize(X)
