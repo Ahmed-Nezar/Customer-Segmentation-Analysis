@@ -23,6 +23,5 @@ class Utils:
         os.makedirs(self.data_dir, exist_ok=True)
         os.makedirs(self.model_path, exist_ok=True)
         os.makedirs(self.plot_path, exist_ok=True)
-        print(f"Created directories: {self.log_path}, {
-              self.data_path}, {self.model_path}")
+        print(f"Created directories: {self.log_path}, {self.data_path}, {self.model_path}")
         # Any other directories you want to create can be added here
