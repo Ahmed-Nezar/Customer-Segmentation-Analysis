@@ -1,4 +1,4 @@
-from src.utils import Utils
+from src.utils import Utils, Monitor
 from src.preprocessing import Preprocessor
 # Any other imports you want to add can be added here
 
@@ -18,6 +18,9 @@ if __name__ == "__main__":
     Utils.preprocessor_config["Normalizer"] = "MinMaxScaler"
     Utils.preprocessor_config["Encoder"] = "LabelEncoder"
     dataset = Utils.load_data()
+    
+    # Plotting the dataset
+    Monitor.run(dataset)
 
     preprocessor = Preprocessor(dataset)
 
