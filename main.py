@@ -15,7 +15,7 @@ if __name__ == "__main__":
         "excls_cols": ["CustomerID"],
         "categorical_cols": ['Gender'],
     '''
-    Utils.preprocessor_config["Normalizer"] = "LogNormalizer"
+    Utils.preprocessor_config["Normalizer"] = "MinMaxScaler"
     Utils.preprocessor_config["Encoder"] = "LabelEncoder"
     dataset = Utils.load_data()
 
@@ -24,5 +24,5 @@ if __name__ == "__main__":
     #! the final preprocessed dataset is returned with the following line
     dataset_preprocessed = preprocessor.preprocess()
 
-    # print(dataset_preprocessed.head())
+    print(dataset_preprocessed.head())
     print("main.py executed successfully")
