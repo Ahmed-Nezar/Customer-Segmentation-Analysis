@@ -92,3 +92,26 @@ class OutlierRemoval:
         
         return self.dataset
 
+    def remove_outliers_zscore_IQR(self, zscore_threshold=3):
+        """
+        Removes outliers detected by both IQR and Z-score methods.
+        Equivalent to the standalone `outliers_removal_zscore_IQR` function.
+
+        Parameters:
+            zscore_threshold (float): The Z-score threshold to flag outliers.
+        """
+        # Detect outliers using both IQR and Z-score methods
+        self.detect_outliers_IQR()
+        self.detect_outliers_zscore(threshold=zscore_threshold)
+
+        # Find all columns starting with "OUTLIER"
+        outliers_columns = [col for col in self.dataset.columns if col.startswith("OUTLIER")]
+
+        # Filter out rows with any outliers
+        self.dataset = self.dataset[~self.dataset[outliers_columns].any(axis=1)]
+
+        # Drop all "OUTLIER" columns and the 'CustomerID' column
+        self.dataset.drop(columns=outliers_columns, inplace=True, errors='ignore')
+        self.dataset.drop(columns=['CustomerID'], inplace=True, errors='ignore')
+
+        return self.dataset
