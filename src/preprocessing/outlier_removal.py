@@ -46,3 +46,24 @@ class OutlierRemoval:
 
         return self.dataset
 
+    def remove_outliers_IQR(self):
+        """
+        Removes outliers detected by the IQR method.
+        Equivalent to the standalone `outliers_removal_IQR` function.
+        """
+        # Detect outliers using IQR
+        self.detect_outliers_IQR()
+        
+        # Find all columns starting with "OUTLIER"
+        outliers_columns = [col for col in self.dataset.columns if col.startswith("OUTLIER")]
+        
+        # Filter out rows with any IQR-based outliers
+        outlier_cols = [col for col in self.dataset.columns if col.startswith("OUTLIER_IQR")]
+        self.dataset = self.dataset[~self.dataset[outlier_cols].any(axis=1)]
+        
+        # Drop all "OUTLIER" columns and the 'CustomerID' column
+        self.dataset.drop(columns=outliers_columns, inplace=True, errors='ignore')
+        self.dataset.drop(columns=['CustomerID'], inplace=True, errors='ignore')
+        
+        return self.dataset
+
