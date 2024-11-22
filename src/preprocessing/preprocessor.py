@@ -4,7 +4,7 @@ from src.utils import Utils
 
 
 class Preprocessor:
-    def __init__(self, datset):
+    def __init__(self, dataset):
         """
         Initializes the Preprocessor class.
 
@@ -14,7 +14,7 @@ class Preprocessor:
         """
         self.config = Utils.preprocessor_config
         # self.dataset = pd.read_csv(Utils.data_path)
-        self.dataset = datset
+        self.dataset = dataset
         # self.Cat_columns = []
 
     def preprocess(self):
@@ -29,11 +29,38 @@ class Preprocessor:
         """
         # self.__check_nulls()
         # self.__check_duplicates()
-        self.dataset = self.dataset.drop(columns=self.config["excls_cols"])
+        self.__drop_cols(self.config["excls_cols"])
+        # self.__rename()
         # self.dataset = self.dataset.drop(columns=self.config["excls_cols"])
-        self.__scale()
+        if self.config["Normalizer"] and self.config["Normalizer"] != "None":
+            self.__scale()
         self.__encode()
         return self.dataset
+
+    def __drop_cols(self, col_list):
+        """
+        Drops specified columns from the dataset.
+        Parameters:
+        - col_list (list): List of column names to be dropped from the dataset.
+
+        Returns:
+            None
+        """
+        self.dataset = self.dataset.drop(columns=col_list)
+
+    def __rename(self):
+        """
+        Renames specific columns in the dataset for consistency and ease of use.
+
+        The following columns are renamed:
+        - 'Annual Income (k$)' to 'Annual_Income'
+        - 'Spending Score (1-100)' to 'Spending_Score'
+
+        Returns:
+            None
+        """
+        self.dataset = self.dataset.rename(columns={'Annual Income (k$)': 'Annual_Income',
+                                                    'Spending Score (1-100)': 'Spending_Score'})
 
     def __scale(self):
         """
@@ -89,7 +116,6 @@ class Preprocessor:
         if self.config["Encoder"] == "OneHotEncoder":
             from sklearn.preprocessing import OneHotEncoder
             encoder = OneHotEncoder()
-            print(self.dataset.head())
             for col in self.dataset.columns:
                 if col in self.config["categorical_cols"]:
                     self.dataset = pd.get_dummies(
@@ -101,7 +127,7 @@ class Preprocessor:
             for col in self.dataset.columns:
                 if col in self.config["categorical_cols"]:
                     self.dataset[col] = encoder.fit_transform(
-                        self.dataset[[col]])
+                        self.dataset[col])
         else:
             raise ValueError(
                 "Encoder not supported, please choose from OneHotEncoder or LabelEncoder")
