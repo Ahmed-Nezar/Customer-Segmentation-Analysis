@@ -37,13 +37,13 @@ We used the [Mall Customers](https://www.kaggle.com/datasets/vjchoudhary7/custom
 │       ├───models            # Saved machine learning models and checkpoints
 │       └───plots             # Generated visualizations and plots for analysis
 └───src                       # Source code for data processing and analysis
-    ├───__init__.py              # Marks this directory as a Python package
-    ├───preprocessing            # Directory for data preprocessing logic
-    │   ├───__init__.py          # Marks this subdirectory as a Python package
-    │   └───preprocessor.py      # Script containing functions to preprocess the data
-    └───utils                    # Utility scripts for various helper functions and configurations
-        ├───__init__.py          # Marks this subdirectory as a Python package
-        └───utils.py             # Contains helper functions for file handling, logging, and configuration
+    ├───__init__.py           # Marks this directory as a Python package
+    ├───preprocessing         # Directory for data preprocessing logic
+    │   ├───__init__.py       # Marks this subdirectory as a Python package
+    │   └───preprocessor.py   # Script containing functions to preprocess the data
+    └───utils                 # Utility scripts for various helper functions and configurations
+        ├───__init__.py       # Marks this subdirectory as a Python package
+        └───utils.py          # Contains helper functions for file handling, logging, and configuration
   ```
 
 ## Installation
