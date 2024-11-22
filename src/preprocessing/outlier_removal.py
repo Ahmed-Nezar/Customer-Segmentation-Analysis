@@ -67,3 +67,28 @@ class OutlierRemoval:
         
         return self.dataset
 
+
+    def remove_outliers_zscore(self, zscore_threshold=3):
+        """
+        Removes outliers detected by the Z-score method.
+        Equivalent to the standalone `outliers_removal_zscore` function.
+
+        Parameters:
+            zscore_threshold (float): The Z-score threshold to flag outliers.
+        """
+        # Detect outliers using Z-score
+        self.detect_outliers_zscore(threshold=zscore_threshold)
+        
+        # Find all columns starting with "OUTLIER"
+        outliers_columns = [col for col in self.dataset.columns if col.startswith("OUTLIER")]
+        
+        # Filter out rows with any Z-score-based outliers
+        outlier_cols = [col for col in self.dataset.columns if col.startswith("OUTLIER_ZSCORE")]
+        self.dataset = self.dataset[~self.dataset[outlier_cols].any(axis=1)]
+        
+        # Drop all "OUTLIER" columns and the 'CustomerID' column
+        self.dataset.drop(columns=outliers_columns, inplace=True, errors='ignore')
+        self.dataset.drop(columns=['CustomerID'], inplace=True, errors='ignore')
+        
+        return self.dataset
+
