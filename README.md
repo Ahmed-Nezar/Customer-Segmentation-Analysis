@@ -30,13 +30,13 @@ We used the [Mall Customers](https://www.kaggle.com/datasets/vjchoudhary7/custom
 ## Project Structure
 
 ```bash
-├───main.py                      # Main script to run the analysis
-├───run_dir                      # Directory for runtime or experiment-related files
-│   ├───data                     # Stores input datasets and processed data
-│   └───logs                     # Directory to log runtime information
-│       ├───models               # Saved machine learning models and checkpoints
-│       └───plots                # Generated visualizations and plots for analysis
-└───src                          # Source code for data processing and analysis
+├───main.py                   # Main script to run the analysis
+├───run_dir                   # Directory for runtime or experiment-related files
+│   ├───data                  # Stores input datasets and processed data
+│   └───logs                  # Directory to log runtime information
+│       ├───models            # Saved machine learning models and checkpoints
+│       └───plots             # Generated visualizations and plots for analysis
+└───src                       # Source code for data processing and analysis
     ├───__init__.py              # Marks this directory as a Python package
     ├───preprocessing            # Directory for data preprocessing logic
     │   ├───__init__.py          # Marks this subdirectory as a Python package
