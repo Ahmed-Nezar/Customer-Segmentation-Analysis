@@ -30,3 +30,19 @@ class OutlierRemoval:
             )
         return self.dataset
 
+    def detect_outliers_zscore(self, threshold=3):
+        """
+        Detects outliers in numerical columns using the Z-score method.
+        Adds new columns indicating outliers for each numerical column.
+
+        Parameters:
+            threshold (float): The Z-score threshold to flag outliers.
+        """
+        numerical_data = self.dataset.select_dtypes(include=np.number)
+        z_scores = pd.DataFrame(zscore(numerical_data), columns=numerical_data.columns, index=self.dataset.index)
+
+        for col in z_scores.columns:
+            self.dataset[f'OUTLIER_ZSCORE_{col}'] = (np.abs(z_scores[col]) > threshold)
+
+        return self.dataset
+
